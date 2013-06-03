@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour {
 	public float jumpSpeed = 10.0f;
 	public float friction = 0.8f;
 	public float minSpeed = 0.2f;
-	public float gravity = -20.0f;
+	public float gravity = 20.0f;
 
 	// Use this for initialization
 	void Start() {
@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 		accel = new Vector3(x, 0.0f, 0.0f);
 		
 		// apply gravity down
-		acell.y += gravity;
+		accel.y += gravity;
 		
 		// apply accelleration to velocity
 		velocity += accel * Time.deltaTime;
