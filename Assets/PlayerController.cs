@@ -2,65 +2,78 @@ using UnityEngine;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
-	
 	CharacterController cc;
-	
-	public Vector3 velocity;
-	Vector3 accel;
 	CollisionFlags cf;
 	
-	public float speed = 1.0f;
-	public float jumpSpeed = 10.0f;
-	public float friction = 0.8f;
-	public float minSpeed = 0.2f;
-	public float gravity = 20.0f;
+	public float speed = 10f;
+	public float jumpSpeed = 9f;
+	public float gravity = 21f;
+	public float terminalVelocity = 20f;
+	
+	public Vector3 moveVector;
+	public float verticalVelocity;
 
 	// Use this for initialization
 	void Start() {
-		
 		cc = GetComponent<CharacterController>();
-		velocity = Vector3.zero;
-		accel = Vector3.zero;
-		
 	}
 	
 	// Update is called once per frame
 	void Update() {
+		checkMovement();
+		handleActionInput();
+		processMovement();
+	}
+	
+	void checkMovement(){
+		//	Move left/right.
+		var deadZone = 0.1f;
+		verticalVelocity = moveVector.y;
+		moveVector = Vector3.zero;
 		
-		// are we jumping
-		bool jumping = Input.GetButtonDown("Jump");
+		if(Input.GetAxis("Horizontal") > deadZone || Input.GetAxis("Horizontal") < -deadZone){
+			moveVector += new Vector3(Input.GetAxis("Horizontal"), 0, 0);
+		}
+	}
+	
+	void handleActionInput(){
+		if(Input.GetButton("Jump")){
+			jump();
+		}
+	}
+	
+	void processMovement(){
+		//	Transform moveVector into world-space relative to character rotation.
+		moveVector = transform.TransformDirection(moveVector);
 		
-		// get the horizontal movement
-		var x = Input.GetAxis("Horizontal") * (100 * speed);
-		
-		// get accelleration from input
-		accel = new Vector3(x, 0.0f, 0.0f);
-		
-		// apply gravity down
-		accel.y += gravity;
-		
-		// apply accelleration to velocity
-		velocity += accel * Time.deltaTime;
-		
-		// apply friction
-		velocity.x *= friction;
-		
-		// kill vertical velocity when hitting ceiling or floor
-		if (isVerticallyCollided()) {
-			velocity.y = 0.0f;
+		//	Normalized moveVector if magniture > 1.
+		if(moveVector.magnitude > 1){
+			moveVector = Vector3.Normalize(moveVector);
 		}
 		
-		// jumping
-		if (isGrounded() && jumping) {
-			velocity.y += jumpSpeed;
+		moveVector *= speed;
+		
+		//	Reapply vertical vlocity to moveVector.y.
+		moveVector = new Vector3(moveVector.x, verticalVelocity, moveVector.z);
+		
+		applyGravity();
+		
+		cf = cc.Move(moveVector * Time.deltaTime);
+	}
+	
+	void applyGravity(){
+		if(moveVector.y > -terminalVelocity){
+			moveVector = new Vector3(moveVector.x, (moveVector.y - gravity * Time.deltaTime), moveVector.z);
 		}
-		
-		// if our speed is lower than min speed then cancel it entirely
-		if (Mathf.Abs(velocity.x) < minSpeed) velocity.x = 0.0f;
-		
-		// update collision flags from move
-		cf = cc.Move(velocity * Time.deltaTime);
-
+		if(cc.isGrounded && moveVector.y < -1){
+			moveVector = new Vector3(moveVector.x, -1, moveVector.z);
+		}
+	}
+	
+	public void jump(){
+		if(cc.isGrounded){
+			verticalVelocity = jumpSpeed;
+		}
 	}
 	
 	bool isGrounded() {
