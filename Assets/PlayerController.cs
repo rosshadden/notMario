@@ -29,6 +29,11 @@ public class PlayerController : MonoBehaviour {
 		//	Move left/right.
 		var deadZone = 0.1f;
 		verticalVelocity = moveVector.y;
+		
+		if(isCeiled()){
+			verticalVelocity = 0;
+		}
+		
 		moveVector = Vector3.zero;
 		
 		if(Input.GetAxis("Horizontal") > deadZone || Input.GetAxis("Horizontal") < -deadZone){
