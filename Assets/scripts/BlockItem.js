@@ -1,6 +1,8 @@
 #pragma strict
 
-class BlockBreakable extends Block {
+class BlockItem extends Block {
+	var contents = 'empty';
+	
 	function Start() {
 	}
 	
