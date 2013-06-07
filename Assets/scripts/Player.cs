@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class playerController : MonoBehaviour {
+public class Player : MonoBehaviour {
 	CharacterController cc;
 	CollisionFlags cf;
 	
