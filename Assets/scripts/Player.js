@@ -148,7 +148,7 @@ function ApplyMovement() {
 				}
 				
 				if(isCeiled()){
-					movement.offset.y = -speed / 2;
+					movement.offset.y = -speed;
 				}
 			}
 		break;
