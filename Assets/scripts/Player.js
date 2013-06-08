@@ -44,6 +44,7 @@ class Movement {
 	var gravity : float = 20;
 	var jumpHeight : float = 8;
 	var walkSpeed : float = 6;
+	var runSpeed : float = 10;
 	var rotate : boolean = false; // Should the character rotate?
 	var rotateIn3D : boolean = false; // Should the character be rotated in 3D?
 	var rotationSmoothing : float = 10; // Rotation Smoothing speed (for "Rotate In 3D")
@@ -113,13 +114,22 @@ function MoveCharacter() {
 }
  
 function ApplyMovement() {
+	var speed = movement.walkSpeed;
+	
 	switch (controller.isGrounded) {
 		// The character is on the ground
 		case true:
 			movement.usedExtraJump = false;
 			if (movement.enabled) {
-				movement.offset = Vector3(Input.GetAxis("Horizontal"), 0, 0) * movement.walkSpeed;
-				if (Input.GetButtonDown("Jump")) ApplyJump();
+				if(Input.GetButton("Run")){
+					speed = movement.runSpeed;
+				}
+				
+				movement.offset = Vector3(Input.GetAxis("Horizontal"), 0, 0) * speed;
+				
+				if(Input.GetButtonDown("Jump")){
+					ApplyJump();
+				}
 			} else {
 				movement.offset = Vector3.zero;
 			}
@@ -128,7 +138,7 @@ function ApplyMovement() {
 		// The character is midair
 		case false:
 			if (movement.enabled) {
-				movement.offset.x = Input.GetAxis("Horizontal") * movement.walkSpeed;
+				movement.offset.x = Input.GetAxis("Horizontal") * speed;
 				// Apply an extra jump if the jump input button is pressed a second time
 				// The final jump height will be greatest at the apex of the first jump
 				if (Input.GetButtonDown("Jump") && ! movement.usedExtraJump) {
@@ -137,7 +147,7 @@ function ApplyMovement() {
 				}
 				
 				if(isCeiled()){
-					movement.offset.y = -movement.walkSpeed / 2;
+					movement.offset.y = -speed / 2;
 				}
 			}
 		break;
