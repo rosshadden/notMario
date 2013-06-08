@@ -29,7 +29,7 @@ var movement : Movement;
 var collision : CollisionFlags;
  
 private var controller : CharacterController;
- 
+
 /***********************************************************************
  * Classes
  ***********************************************************************/
@@ -121,7 +121,8 @@ function ApplyMovement() {
 		case true:
 			movement.usedExtraJump = false;
 			if (movement.enabled) {
-				if(Input.GetButton("Run")){
+				var isRunning = Input.GetButton("Run");
+				if(isRunning){
 					speed = movement.runSpeed;
 				}
 				
