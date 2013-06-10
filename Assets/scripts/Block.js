@@ -1,10 +1,17 @@
 #pragma strict
 
 class Block extends MonoBehaviour {
-	function Start() {
-		Debug.Log("starting");
+	function Start() {}
+	
+	function Update() {}
+	
+	function OnTriggerEnter(other : Collider) {
+		if(other.gameObject.tag == "Player"){
+			this.hitBottom();
+		}
 	}
 	
-	function Update() {
-	}
+	function hitTop() {}
+	
+	function hitBottom() {}
 }
