@@ -1,57 +1,57 @@
 #pragma strict
  
-/***********************************************************************
- * Notes
- ***********************************************************************/
+////////////////////////////////
+//	 Notes
+////////////////////////////////
  
 /*
- * This is a boilerplate controller for a 2D or 2.5D platform game.
- * To that end, this controller allows for movement along the X and Y
- * axes only. There is built-in support for jumping, double jumping,
- * rotating in 3D (as opposed to 2D), setting a spawn point, etc.
- * This script was influenced by Unity's 2D Gameplay Tutorial:
- * http://unity3d.com/support/resources/tutorials/2d-gameplay-tutorial.
+ *	 This is a boilerplate controller for a 2D or 2.5D platform game.
+ *	 To that end, this controller allows for movement along the X and Y
+ *	 axes only. There is built-in support for jumping, double jumping,
+ *	 rotating in 3D (as opposed to 2D), setting a spawn point, etc.
+ *	 This script was influenced by Unity's 2D Gameplay Tutorial:
+ *	 http://unity3d.com/support/resources/tutorials/2d-gameplay-tutorial.
  */
- 
-/***********************************************************************
- * Requires
- ***********************************************************************/
+  
+////////////////////////////////////////////////////////////////
+//	 Requires
+////////////////////////////////
  
 // Require a character controller to be attached to the same game object
 @script RequireComponent(CharacterController)
  
-/***********************************************************************
- * Variables
- ***********************************************************************/
+////////////////////////////////
+//	 Variables
+////////////////////////////////
  
 var spawnPoint : Transform; // The character will spawn here
 var movement : Movement;
 var collision : CollisionFlags;
+var state : int;
  
-private var controller : CharacterController;
+private var character : CharacterController;
 
-/***********************************************************************
- * Classes
- ***********************************************************************/
+////////////////////////////////
+//	 Classes
+////////////////////////////////
  
 class Movement {
- 
-	/*******************************
-	 * Public (Inspector) variables
-	 *******************************/
+	////////////////////////////////
+	//	 Public (Inspector) variables
+	////////////////////////////////
  
 	var enabled : boolean = true; // Is the character controller enabled?
 	var gravity : float = 20;
-	var jumpHeight : float = 8;
+	var jumpHeight : float = 14;
 	var walkSpeed : float = 6;
 	var runSpeed : float = 10;
-	var rotate : boolean = false; // Should the character rotate?
-	var rotateIn3D : boolean = false; // Should the character be rotated in 3D?
+	var rotate : boolean = true; // Should the character rotate?
+	var rotateIn3D : boolean = true; // Should the character be rotated in 3D?
 	var rotationSmoothing : float = 10; // Rotation Smoothing speed (for "Rotate In 3D")
  
-	/*******************************
-	 * NonSerialized variables
-	 *******************************/
+	////////////////////////////////
+	//	 NonSerialized variables
+	////////////////////////////////
  
 	// The character's current horizontal direction
 	@System.NonSerialized
@@ -65,21 +65,22 @@ class Movement {
 	@System.NonSerialized
 	var offset : Vector3;
  
-	/*******************************
-	 * Jumping
-	 *******************************/
+	////////////////////////////////
+	//	 Jumping
+	////////////////////////////////
  
 	// Did the user press the jump input button while midair?
 	@System.NonSerialized
 	var usedExtraJump : boolean = false;
 }
  
-/***********************************************************************
- * Unity Functions
- ***********************************************************************/
+////////////////////////////////
+//	 Unity Functions
+////////////////////////////////
  
 function Awake() {
-	controller = GetComponent(CharacterController);
+	character = GetComponent(CharacterController);
+	state = 0;
 	Spawn();
 }
  
@@ -96,9 +97,9 @@ function Update() {
 	MoveCharacter();
 }
  
-/***********************************************************************
- * Custom Functions
- ***********************************************************************/
+////////////////////////////////
+//	 Custom Functions
+////////////////////////////////
  
 function Spawn() {
 	transform.position = spawnPoint.position;
@@ -110,13 +111,13 @@ function MoveCharacter() {
 	ApplyMovement();
 	ApplyGravity();
 	// Move the character (with deltaTime to ensure frame rate independence)
-	collision = controller.Move(movement.offset * Time.deltaTime);
+	collision = character.Move(movement.offset * Time.deltaTime);
 }
  
 function ApplyMovement() {
 	var speed = movement.walkSpeed;
 	
-	switch (controller.isGrounded) {
+	switch (character.isGrounded) {
 		// The character is on the ground
 		case true:
 			movement.usedExtraJump = false;
@@ -178,9 +179,13 @@ function ApplyGravity() {
 }
 	
 function isGrounded() : boolean {
-	return controller.isGrounded;
+	return character.isGrounded;
 }
 
 function isCeiled() : boolean {
 	return (collision & CollisionFlags.CollidedAbove) != 0;	
+}
+
+function grow() {
+	state = 1;
 }
